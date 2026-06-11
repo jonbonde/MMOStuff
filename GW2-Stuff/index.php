@@ -57,12 +57,8 @@ if (!isset($_COOKIE['isCharactersSet'])) {
                 localStorage.setItem('gw2Characters', JSON.stringify(data));
             }
 
-            console.log(typeof data);
-            console.log("Dette er data: ", data);
-
             data.forEach((character, index) => {
                 const encoded = encodeURI(JSON.stringify(character));
-                console.log(encoded)
                 charactersDiv.innerHTML += `<a href="./characterDetails.php?id=${encoded}" class="font-medium text-fg-brand hover:underline hover:pointer">
                     ${character.name} Level ${character.level} ${character.race} ${character.profession}</a>`;
             });
