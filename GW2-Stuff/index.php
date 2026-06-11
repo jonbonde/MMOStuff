@@ -1,3 +1,33 @@
+<?php
+$response = 1;
+if (!isset($_COOKIE['isCharactersSet'])) {
+    $env = parse_ini_file('../.env');
+    $gw2Key = $env['GW2_API_KEY'];
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://api.guildwars2.com/v2/characters?ids=all',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+            'Authorization: Bearer ' . $gw2Key
+        ),
+    ));
+
+    $response = curl_exec($curl);
+
+    if (curl_errno($curl)) {
+        echo 'Error: ' . curl_error($curl);
+    }
+    curl_close($curl);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,36 +43,7 @@
         <h1 class="text-3xl font-bold">GW2 Stuff</h1>
         <div id="charactersDiv" class="flex flex-col">
         </div>
-        <?php
-            $response = 1;
-            if (!isset($_COOKIE['isCharactersSet'])) {
-                $env = parse_ini_file('../.env');
-                $gw2Key = $env['GW2_API_KEY'];
 
-                $curl = curl_init();
-
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://api.guildwars2.com/v2/characters?ids=all',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'GET',
-                    CURLOPT_HTTPHEADER => array(
-                        'Authorization: Bearer ' . $gw2Key
-                    ),
-                ));
-
-                $response = curl_exec($curl);
-
-                if (curl_errno($curl)) {
-                    echo 'Error: ' . curl_error($curl);
-                }
-                curl_close($curl);
-            }
-        ?>
         <script type="module">
             import { getCookie, setCookie } from '../shared.js';
             let data;
@@ -60,7 +61,7 @@
             console.log("Dette er data: ", data);
 
             data.forEach((character, index) => {
-                const encoded = encodeURI(character.name);
+                const encoded = encodeURI(JSON.stringify(character));
                 console.log(encoded)
                 charactersDiv.innerHTML += `<a href="./characterDetails.php?id=${encoded}" class="font-medium text-fg-brand hover:underline hover:pointer">
                     ${character.name} Level ${character.level} ${character.race} ${character.profession}</a>`;

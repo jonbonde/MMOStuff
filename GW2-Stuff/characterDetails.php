@@ -1,3 +1,32 @@
+<?php
+$character = json_decode($_GET['id']);
+$specIdsArr = array();
+foreach ($character->specializations->pve as $spec) {
+    $specIdsArr[] = $spec->id;
+}
+
+$env = parse_ini_file('../.env');
+$gw2Key = $env['GW2_API_KEY'];
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+    CURLOPT_URL => 'https://api.guildwars2.com/v2/specializations?ids=' . implode(',', $specIdsArr),
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'GET',
+    CURLOPT_HTTPHEADER => array(
+        'Authorization: Bearer ' . $gw2Key
+    ),
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,24 +40,25 @@
     <a href='../' class="absolute bottom-5 left-5"><i class="fa fa-arrow-left" style="font-size:48px;"></i></a>
     <div class="flex mt-5 w-full items-center justify-center flex-col">
         <h1 id="title" class="text-3xl font-bold">GW2 Stuff</h1>
-        <div id="charactersDiv" class="flex flex-col">
+        <div id="specsDiv" class="flex flex-col">
+            <div>Equiped specializations and traits</div>
         </div>
     </div>
     <script type="module">
         const params = new URLSearchParams(window.location.search);
-        const name = decodeURI(params.get("id"));
+        const character = JSON.parse(decodeURI(params.get("id")));
 
-        document.getElementById('title').innerHTML = name;
+        document.getElementById('title').innerHTML = character.name;
+        const specsDiv = document.getElementById('specsDiv');
 
-        const character = JSON.parse(localStorage.getItem('gw2Characters')).find(char => char.name === name);
-        console.log(typeof character);
-        console.log("character: ", character);
-
-        
+        const specs = <?php echo $response ?>;
+        console.log("specs: ", specs);
+        specs.forEach((spec, index) => {
+            specsDiv.innerHTML += `<div class="relative bg-[url(${spec.background})]" style="background-position-y: -43px; height: 13em; width: 41em;">
+                <img class="absolute h-24 inset-0 my-auto top-5 left-22" src="${spec.icon}" title="${spec.name}" />
+            </div>`;
+        });
+        // style="top: 8em; left: 6em; height: 128px; width: 128px;"
     </script>
 </body>
 </html>
-<?php
-$name = $_GET['id'];
-echo $name;
-?>
