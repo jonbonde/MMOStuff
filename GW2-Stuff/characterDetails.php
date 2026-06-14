@@ -38,7 +38,7 @@ curl_close($curl);
 </head>
 <body>
     <a href='../' class="absolute bottom-5 left-5"><i class="fa fa-arrow-left" style="font-size:48px;"></i></a>
-    <div class="flex mt-5 w-full items-center justify-center flex-col">
+    <div id="container" class="flex mt-5 w-full items-center justify-center flex-col">
         <h1 id="title" class="text-3xl font-bold">GW2 Stuff</h1>
         <div id="specsDiv" class="flex flex-col">
             <div>Equiped specializations and traits</div>
@@ -47,6 +47,8 @@ curl_close($curl);
     <script type="module">
         const params = new URLSearchParams(window.location.search);
         const character = JSON.parse(decodeURI(params.get("id")));
+        console.log("character: ", character);
+        document.getElementById('container').classList.add(`bg-[url('https://d3qqidoz8mm2hm.cloudfront.net/wp-content/uploads/wallpapers/GW2${character.profession}Painted-1920x1080.jpg')]`);
 
         document.getElementById('title').innerHTML = character.name;
         const specsDiv = document.getElementById('specsDiv');
@@ -54,11 +56,15 @@ curl_close($curl);
         const specs = <?php echo $response ?>;
         console.log("specs: ", specs);
         specs.forEach((spec, index) => {
-            specsDiv.innerHTML += `<div class="relative bg-[url(${spec.background})]" style="background-position-y: -43px; height: 13em; width: 41em;">
-                <img class="absolute h-24 inset-0 my-auto top-5 left-22" src="${spec.icon}" title="${spec.name}" />
-            </div>`;
+            specsDiv.innerHTML += `
+                <div class="flex items-center relative h-[12em] w-[40em] mt-2">
+                    <div class="absolute bg-bottom-left top-0 left-0 right-0 bottom-0 w-full h-full bg-[url(${spec.background})] title="${spec.name}" rounded">
+                        <img class="absolute h-24 inset-0 my-auto top-5 left-20" src="${spec.icon}" title="${spec.name}" />
+                    </div>
+                </div>
+            `;
         });
-        // style="top: 8em; left: 6em; height: 128px; width: 128px;"
+        // style="background-position-y: -43px; height: 13em; width: 41em;"
     </script>
 </body>
 </html>
