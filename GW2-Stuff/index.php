@@ -41,7 +41,7 @@ if (!isset($_COOKIE['isCharactersSet'])) {
     <div class="relative h-[100vh] w-[100vw]">
         <div class="absolute bg-no-repeat top-0 left-0 right-0 bottom-0 w-full h-full bg-[url('https://d3qqidoz8mm2hm.cloudfront.net/wp-content/uploads/wallpapers/GuildWars2-01-1920x1080.jpg')]">
             <a href='../' class="absolute bottom-5 left-5"><i class="fa fa-arrow-left" style="font-size:48px;"></i></a>
-            <div class="flex mt-5 w-full items-left ml-7 justify-center flex-col">
+            <div class="flex mt-5 items-left ml-7 justify-center flex-col w-fit">
                 <h1 class="text-3xl font-bold">GW2 Stuff</h1>
                 <div id="charactersDiv" class="flex flex-col">
                 </div>
@@ -60,7 +60,8 @@ if (!isset($_COOKIE['isCharactersSet'])) {
                     }
 
                     data.forEach((character, index) => {
-                        const encoded = encodeURI(JSON.stringify(character));
+                        const specIds = character.specializations.pve.map(x => x.id);
+                        const encoded = `${encodeURI(character.name)}&specs=${specIds}`;
                         charactersDiv.innerHTML += `<a href="./GW2-Stuff/characterDetails.php?id=${encoded}" class="font-medium text-lg text-fg-brand hover:underline hover:pointer">
                             ${character.name} Level ${character.level} ${character.race} ${character.profession}</a>`;
                     });
